@@ -1,7 +1,6 @@
 import numpy as np
 import wfdb
 import ast
-from unpack import unpack
 import pandas as pd
 from tqdm import tqdm
 import os
@@ -25,7 +24,6 @@ def aggregate_diagnostic(y_dic, target_list):
 
         
 def load_raw_data(df,path,target_list,dir_name  ):
-    print('processing stareted')
     count = 1
     to_save = 'files_processed/'
     if not os.path.exists(to_save):
@@ -43,14 +41,12 @@ def load_raw_data(df,path,target_list,dir_name  ):
         tmp_dict = {'data': trn, 'target': trgt}
         np.save(to_save+str(count)+'.npy', tmp_dict)
         count+=1
-    print('processing finished')
 
 
-def start_processing():
+def start_processing(path):
     #possible to implement choice of sampl.rate 100/500 as input
     sampling_rate = 500
     dir_name = 'filename_hr'
-    path = unpack()
 
     agg_df = pd.read_csv(path+ 'scp_statements.csv', index_col = 0)
     
