@@ -1,12 +1,14 @@
 files_processed
 orig_data
 README.md
-__pycache__
-common.ipynb         
+common.ipynb               
 Common.ipynb         
 data_csv_to_npy.ipynb
 ptbxl_database.csv
 scp_statements.csv
 venv/
+Result.docx
+__pycache__
+..gitignore.swp
 .ipynb_checkpoints/
 .vscode/
