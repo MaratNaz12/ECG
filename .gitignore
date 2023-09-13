@@ -1,0 +1,12 @@
+Common.ipynb         
+data_csv_to_npy.ipynb
+ptbxl_database.csv
+__pycache__       
+Result.docx
+scp_statements.csv
+venv/
+Result.docx
+__pycache__
+..gitignore.swp
+.ipynb_checkpoints/
+.vscode/
