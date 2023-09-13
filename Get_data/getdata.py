@@ -1,7 +1,7 @@
 import requests
 from tqdm import tqdm
 
-def data_load():
+def data_load(path_for_dir ):
 
     url = 'https://physionet.org/static/published-projects/ptb-xl/ptb-xl-a-large-publicly-available-electrocardiography-dataset-1.0.1.zip'
     response = requests.get(url, stream=True)
@@ -10,7 +10,7 @@ def data_load():
     block_size = 1024 *1024
     progress_bar = tqdm(total=zipfile_size, unit='B', unit_scale=True)
 
-    with open('PTB_XL.zip', 'wb') as file:
+    with open(path_for_dir + 'PTB_XL.zip', 'wb') as file:
         for data in response.iter_content(block_size):
             file.write(data)
             progress_bar.update(len(data))
