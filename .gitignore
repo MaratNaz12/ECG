@@ -2,4 +2,11 @@ files_processed
 orig_data
 README.md
 __pycache__
-
+common.ipynb         
+Common.ipynb         
+data_csv_to_npy.ipynb
+ptbxl_database.csv
+scp_statements.csv
+venv/
+.ipynb_checkpoints/
+.vscode/
