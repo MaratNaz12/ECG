@@ -1,0 +1,15 @@
+files_processed
+orig_data
+README.md
+common.ipynb               
+Common.ipynb         
+data_csv_to_npy.ipynb
+ptbxl_database.csv
+scp_statements.csv
+venv/
+Result.docx
+__pycache__
+..gitignore.swp
+.ipynb_checkpoints/
+.vscode/
+userpath_to_dataset.txt
