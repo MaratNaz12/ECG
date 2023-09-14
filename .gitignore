@@ -12,3 +12,4 @@ __pycache__
 ..gitignore.swp
 .ipynb_checkpoints/
 .vscode/
+userpath_to_dataset.txt

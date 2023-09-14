@@ -1,4 +1,9 @@
 import zipfile
+
+'''
+Gets path to dataset zip as an argument, unzips it, returns path to data itself
+'''
+
 def unpack(path_for_dir ):
     with zipfile.ZipFile(path_for_dir + 'PTB_XL.zip', 'r') as zip_ref:
         zip_ref.extractall(path_for_dir + 'PTB_XL')
