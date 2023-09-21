@@ -3,7 +3,7 @@ import shutil
 from Get_data.convert import start_processing
 from Get_data.getdata import data_load
 from Get_data.unpack import unpack
-
+import argparse
 '''
 This file starts data loading and processsing
     1. Asks for a confirmation 
@@ -17,43 +17,43 @@ This file starts data loading and processsing
     6. Delete intermediate data
 '''
 
-str_input = input("Start loading data? (it will take 25 min)     y/n: ")
 
-if str_input == 'y':
 
-    str_input = input("Do you have special path to download data?  (y/n) ")
-    
-    if str_input == 'y':
-        path_for_dir = input("insert the path (ending with '/'): ")
-        with open('userpath_to_dataset.txt', 'w') as file:
-            file.write(path_for_dir)
+
+parser = argparse.ArgumentParser(description='Dataloading configuration')
+
+parser.add_argument( '-p', '--path_for_dir', type=str, default='', help='dir for dataset')
+
+parser.add_argument( '-k', '--keep', action = "store_true", help='flag to (no) keep raw data' )
+
+args = parser.parse_args() 
+
+if not (args.path_for_dir == ''): 
+    args.path_for_dir += '/'
+    with open('userpath_to_dataset.txt', 'w') as file:
+            file.write(args.path_for_dir )
+
+
+
+if not os.path.exists(args.path_for_dir + 'PTB_XL.zip') and not os.path.exists(args.path_for_dir + 'files_processed'):
+    flag = data_load(args.path_for_dir)
+
+    if flag == False:
+        print("ERROR. Delete downloaded file and start again")
+
     else:
-        path_for_dir = ''
+        print("Downoading completed",'\n',"Unpacking started")
+        path = unpack(args.path_for_dir) 
+        print("Unpacking completed",'\n',"Data converting started")
 
-    
+        start_processing(args.path_for_dir, path)
 
-    if not os.path.exists(path_for_dir + 'PTB_XL.zip') and not os.path.exists(path_for_dir + 'files_processed'):
-        flag = data_load(path_for_dir)
+        os.remove(args.path_for_dir + 'PTB_XL.zip')
+        shutil.rmtree(args.path_for_dir + 'PTB_XL')
 
-        if flag == False:
-            print("ERROR. Delete downloaded file and start again")
-
-        else:
-            print("Downoading completed",'\n',"Unpacking started")
-            path = unpack(path_for_dir) 
-            print("Unpacking completed",'\n',"Data converting started")
-
-            start_processing(path_for_dir, path)
-
-            os.remove(path_for_dir + 'PTB_XL.zip')
-            shutil.rmtree(path_for_dir + 'PTB_XL')
-
-            print("Coverting completed")
-    else:
-        print('files already exist, delete them')
-
+        print("Coverting completed")
 else:
-    print("ok, no problems")
+    print('files already exist, delete them')
 
 
 
