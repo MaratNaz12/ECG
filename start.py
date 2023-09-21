@@ -20,35 +20,55 @@ This file starts data loading and processsing
 
 parser = argparse.ArgumentParser(description='Dataloading configuration')
 
-parser.add_argument( '-p', '--path_for_dir', type=str, default='', help='dir for dataset')
+parser.add_argument( '-ps', '--path_src', type=str, default='', help='dir with data')
+parser.add_argument( '-pd', '--path_dst', type=str, default='', help='dir for dataset')
 
-parser.add_argument( '-k', '--keep', action = "store_true", help='flag to (no) keep raw data' )
+parser.add_argument( '-kd', '--keep_data', action = "store_true", help='flag to keep raw data' )
+
+parser.add_argument( '-kz', '--keep_zip', action = "store_true", help='flag not to unzip zip' )
+
+parser.add_argument( '-hz', '--have_zip', action = "store_true", help='flag to unzip then process' )
+
+parser.add_argument( '-hd', '--have_raw_data', action = "store_true", help='flag to only process' )
 
 args = parser.parse_args() 
 
-if not (args.path_for_dir == ''): 
-    args.path_for_dir += '/'
-    with open('userpath_to_dataset.txt', 'w') as file:
-            file.write(args.path_for_dir )
+
+if not (args.path_dst == ''): 
+    args.path_dst += '/'
+
+if not (args.path_src == ''): 
+    args.path_src += '/'   
 
 
-
-if not os.path.exists(args.path_for_dir + 'PTB_XL.zip') and not os.path.exists(args.path_for_dir + 'files_processed'):
-    flag = data_load(args.path_for_dir)
-
-    if flag == False:
-        print("ERROR. Delete downloaded file and start again")
-
+if not (args.have_zip):
+    args.path_src = args.path_dst
+    if not os.path.exists(args.path_dst + 'PTB_XL.zip') and not os.path.exists(args.path_dst + 'files_processed'):
+        print("Downloading started") 
+        flag = data_load(args.path_dst)
+        if flag == False:
+            print("ERROR. Delete downloaded file and start again")  
+        else:
+            print("Downoading completed") 
+    
     else:
-        print("Downoading completed",'\n',"Unpacking started")
-        path = unpack(args.path_for_dir) 
-        print("Unpacking completed",'\n',"Data converting started")
+        print('Delete old files first')
 
-        start_processing(args.path_for_dir, path)
 
-        os.remove(args.path_for_dir + 'PTB_XL.zip')
-        shutil.rmtree(args.path_for_dir + 'PTB_XL')
+path = unpack(args.path_src, args.path_dst, args.have_raw_data, args.keep_zip) 
 
-        print("Coverting completed")
-else:
-    print('files already exist, delete them')
+args.path_dst = args.path_src
+       
+start_processing(args.path_src, args.path_dst,  path)
+
+
+if args.have_raw_data:
+    args.path_dst = args.path_src
+
+
+if not (args.keep):
+    shutil.rmtree(args.path_dst + 'PTB_XL')
+
+
+        
+    

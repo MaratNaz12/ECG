@@ -24,7 +24,7 @@ def aggregate_diagnostic(y_dic, target_list):
 
         
 #convert .dat .hea files into numpy arrays
-def load_raw_data(df,path_for_dir,path,target_list,dir_name ):
+def load_raw_data(df,path_src, path_for_dir,path,target_list,dir_name ):
     #checks if directory exists
     #"count" to name new files
     count = 1
@@ -35,7 +35,7 @@ def load_raw_data(df,path_for_dir,path,target_list,dir_name ):
     for index, row in tqdm(df.iterrows()):
 
         #.dat .hea -> numpy
-        trn,_ = wfdb.rdsamp(path_for_dir+path+row[dir_name])
+        trn,_ = wfdb.rdsamp(path_src+path+row[dir_name])
         trn = np.array(trn).T
 
         #convert text from database to dicts of pathologies 
@@ -50,14 +50,14 @@ def load_raw_data(df,path_for_dir,path,target_list,dir_name ):
 
 
 
-def start_processing(path_for_dir, path):
+def start_processing(path_src, path_for_dir, path):
    
     dir_name = 'filename_hr' #sr = 500
 
     #creating list of rhytthm  pathologies from scp_statements.csv
-    file_statements = pd.read_csv(path_for_dir+ path+ 'scp_statements.csv', index_col = 0)
+    file_statements = pd.read_csv(path_src+ path+ 'scp_statements.csv', index_col = 0)
     rhythm_pathologies  = list(file_statements[file_statements.rhythm == 1].index)
 
     
-    file_database= pd.read_csv(path_for_dir + path+'ptbxl_database.csv', index_col = 'ecg_id')
-    load_raw_data(file_database, path_for_dir, path, rhythm_pathologies, dir_name ) 
+    file_database= pd.read_csv(path_src + path+'ptbxl_database.csv', index_col = 'ecg_id')
+    load_raw_data(file_database,path_src, path_for_dir, path, rhythm_pathologies, dir_name ) 
