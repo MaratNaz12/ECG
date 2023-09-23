@@ -1,9 +1,9 @@
 import numpy as np
 import wfdb
-import ast
 import pandas as pd
 from tqdm import tqdm
 import os
+from shutil import copyfile
 
 '''
 Построчно проходим по файлу ptbxl_database.csv, создаем вектор бинарных таргетов по патологиям [12x1] и, 
@@ -14,50 +14,34 @@ import os
 '''
 
 
-# make binary target vector for each ecg
-def aggregate_diagnostic(y_dic, target_list):
-      tmp = np.zeros((len(target_list),1))
-      for i in range (len(target_list)):
-          if target_list[i] in y_dic:
-              tmp[i] = 1
-      return tmp
-
         
 #convert .dat .hea files into numpy arrays
-def load_raw_data(df,path_src, path_for_dir,path,target_list,dir_name ):
-    #checks if directory exists
-    #"count" to name new files
-    count = 1
+def load_raw_data(df,path_src, path_for_dir,path,dir_name ):
+
+
     to_save = 'files_processed/'
     if not os.path.exists(path_for_dir+ to_save):
         os.mkdir(path_for_dir+ to_save)
 
     for index, row in tqdm(df.iterrows()):
 
-        #.dat .hea -> numpy
+        # .dat .hea -> numpy
         trn,_ = wfdb.rdsamp(path_src+path+row[dir_name])
-        trn = np.array(trn).T
+        trn = np.array(trn, dtype = np.float32).T
+    
 
-        #convert text from database to dicts of pathologies 
-        trgt = ast.literal_eval(row['scp_codes']) 
-        trgt =aggregate_diagnostic(trgt, target_list)
-        
-        #saving dicts for each ecg
-        tmp_dict = {'data': trn, 'target': trgt}
-        np.save(path_for_dir+ to_save+str(count)+'.npy', tmp_dict)
-        count+=1
-
+        np.save(path_for_dir+ to_save+str(index)+'.npy', trn)
 
 
 
 def start_processing(path_src, path_for_dir, path):
-   
+    if not os.path.exists(path_for_dir + 'data'):
+        os.mkdir(path_for_dir+ 'data/')
+
+    copyfile(path_src + 'ptbxl_database.csv', path_for_dir +'data/' + 'ptbxl_database.csv')
+
     dir_name = 'filename_hr' #sr = 500
-
-    #creating list of rhytthm  pathologies from scp_statements.csv
-    file_statements = pd.read_csv(path_src+ path+ 'scp_statements.csv', index_col = 0)
-    rhythm_pathologies  = list(file_statements[file_statements.rhythm == 1].index)
-
     
     file_database= pd.read_csv(path_src + path+'ptbxl_database.csv', index_col = 'ecg_id')
-    load_raw_data(file_database,path_src, path_for_dir, path, rhythm_pathologies, dir_name ) 
+    load_raw_data(file_database,path_src, path_for_dir + 'data/', path,  dir_name ) 
+

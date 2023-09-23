@@ -2,6 +2,7 @@ import torch.optim
 import data_preparation as dp
 import model as mdl
 import training as tr
+import argparse
 
 '''
 batch_size = 500
@@ -13,8 +14,14 @@ batch_size = 500
 path = 'files_processed/'
 '''
 
+parser = argparse.ArgumentParser(description='Dataloading configuration')
+
+parser.add_argument('-p', '--path', type=str, default='', help='dir with data'  )
+
+args = parser.parse_args() 
+
 ptlg_name = 'SR'
-train_dataset,valid_dataset,test_dataset = dp.DatasetCreation(ptlg_name)
+train_dataset,valid_dataset,test_dataset = dp.DatasetCreation(args.path, ptlg_name)
 
 
 model = mdl.RhythmECGClassification(12,1)

@@ -11,7 +11,9 @@ tdqm for progress bar
 
 def data_load(path_for_dir ):
 
-    url = 'https://physionet.org/static/published-projects/ptb-xl/ptb-xl-a-large-publicly-available-electrocardiography-dataset-1.0.1.zip'
+    # url = 'https://physionet.org/static/published-projects/ptb-xl/ptb-xl-a-large-publicly-available-electrocardiography-dataset-1.0.1.zip'
+    
+    url = 'https://www.kaggle.com/datasets/khyeh0719/ptb-xl-dataset/download?datasetVersionNumber=1'
     response = requests.get(url, stream=True)
 
     zipfile_size  = int(response.headers.get('content-length', 0))

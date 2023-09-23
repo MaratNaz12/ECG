@@ -20,16 +20,10 @@ This file starts data loading and processsing
 
 parser = argparse.ArgumentParser(description='Dataloading configuration')
 
-parser.add_argument( '-ps', '--path_src', type=str, default='', help='dir with data')
+parser.add_argument( '-ps', '--path_src', type=str, default='', help='dir with data'  )
 parser.add_argument( '-pd', '--path_dst', type=str, default='', help='dir for dataset')
+parser.add_argument( '-k', '--keep', action = "store_true", help='flag to keep raw data' )
 
-parser.add_argument( '-kd', '--keep_data', action = "store_true", help='flag to keep raw data' )
-
-parser.add_argument( '-kz', '--keep_zip', action = "store_true", help='flag not to unzip zip' )
-
-parser.add_argument( '-hz', '--have_zip', action = "store_true", help='flag to unzip then process' )
-
-parser.add_argument( '-hd', '--have_raw_data', action = "store_true", help='flag to only process' )
 
 args = parser.parse_args() 
 
@@ -37,12 +31,7 @@ args = parser.parse_args()
 if not (args.path_dst == ''): 
     args.path_dst += '/'
 
-if not (args.path_src == ''): 
-    args.path_src += '/'   
-
-
-if not (args.have_zip):
-    args.path_src = args.path_dst
+if args.path_src == '':
     if not os.path.exists(args.path_dst + 'PTB_XL.zip') and not os.path.exists(args.path_dst + 'files_processed'):
         print("Downloading started") 
         flag = data_load(args.path_dst)
@@ -54,20 +43,19 @@ if not (args.have_zip):
     else:
         print('Delete old files first')
 
+    args.path_src = args.path_dst
+    path = unpack(args.path_dst) 
+else:
+    args.path_src += '/'  
+    path = ''
 
-path = unpack(args.path_src, args.path_dst, args.have_raw_data, args.keep_zip) 
 
-args.path_dst = args.path_src
        
 start_processing(args.path_src, args.path_dst,  path)
 
 
-if args.have_raw_data:
-    args.path_dst = args.path_src
-
-
 if not (args.keep):
-    shutil.rmtree(args.path_dst + 'PTB_XL')
+    shutil.rmtree(args.path_src + 'PTB_XL')
 
 
         
