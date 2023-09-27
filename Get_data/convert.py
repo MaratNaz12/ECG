@@ -23,7 +23,7 @@ def load_raw_data(df,path_src, path_for_dir,path,dir_name ):
     if not os.path.exists(path_for_dir+ to_save):
         os.mkdir(path_for_dir+ to_save)
 
-    for index, row in tqdm(df.iterrows()):
+    for index, row in tqdm(df.iterrows(), total=21837, desc = "Data processing status"):
 
         # .dat .hea -> numpy
         trn,_ = wfdb.rdsamp(path_src+path+row[dir_name])

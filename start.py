@@ -55,7 +55,7 @@ start_processing(args.path_src, args.path_dst,  path)
 
 
 if not (args.keep):
-    shutil.rmtree(args.path_src + 'PTB_XL')
+    shutil.rmtree(args.path_src)
 
 
         

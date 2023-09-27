@@ -21,11 +21,14 @@ parser.add_argument('-p', '--path', type=str, default='', help='dir with data'  
 args = parser.parse_args() 
 
 ptlg_name = 'SR'
+
 train_dataset,valid_dataset,test_dataset = dp.DatasetCreation(args.path, ptlg_name)
 
 
+
+
 model = mdl.RhythmECGClassification(12,1)
-lr = 0.0003
+lr = 0.000
 epochs_num = 10
 optim = torch.optim.Adam
 weight_decay = True
