@@ -1,0 +1,5 @@
+opt:
+  _target_: torch.optim.Adam
+  weight_decay: False
+  lr: 1e-3
+  _partial_: True
