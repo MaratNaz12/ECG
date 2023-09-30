@@ -1,0 +1,7 @@
+pat_name: "SR"
+batch_size: 300
+split: [0.8, 0.1]
+path_for_sigs: /home/narmarinad_12/ECG/data/files_processed
+path_for_datamap: /home/narmarinad_12/ECG/data
+pin_memory: True
+num_workers: 2

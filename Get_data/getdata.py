@@ -1,7 +1,6 @@
 import requests
 from tqdm import tqdm
 
-
 '''
 Function data_load collects PTB_XL dataset from the internet with py.requests
 tdqm for progress bar

@@ -10,20 +10,21 @@ from torch.utils.data import random_split
 
 class DatasetPTBXL(Dataset):
 
-    def __init__(self, path,p_name):
+    def __init__(self, cfg_dataset):
 
-        self.path = path +'data/'
+        self.path_for_data = cfg_dataset.path_for_sigs + '/'
+        self.path_for_map =  cfg_dataset.path_for_datamap + '/'
+    
+        self.df = pd.read_csv(self.path_for_map+ 'ptbxl_database.csv', index_col = 'ecg_id')       
 
-        self.df = pd.read_csv(self.path + 'ptbxl_database.csv', index_col = 'ecg_id')       
-
-        self.target_name = p_name
+        self.target_name = cfg_dataset.pat_name
 
     def __len__(self):
-        return  len(os.listdir(self.path + 'files_processed/' ))
+        return  len(os.listdir(self.path_for_data ))
 
 
     def __getitem__(self, idx):
-        data = np.load(self.path + 'files_processed/' + str(idx+1) + '.npy')
+        data = np.load(self.path_for_data + str(idx+1) + '.npy')
 
         target  = int(self.target_name in ast.literal_eval(self.df.iloc[idx]['scp_codes'])) 
 
@@ -33,19 +34,19 @@ class DatasetPTBXL(Dataset):
 
 
 
-def DatasetCreation(path, ptlg_name, t_size = 0.8, v_size = 0.1, batch_size = 500, num_workers = 1, pin_memory = True):
+def DatasetCreation(cfg_dataset):
   
-    dataset = DatasetPTBXL(path,ptlg_name)
+    dataset = DatasetPTBXL(cfg_dataset)
     
     tmp_len = len(dataset)
-    train_size = int (t_size * tmp_len)
-    valid_size = int (v_size * tmp_len)
+    train_size = int (cfg_dataset.split[0] * tmp_len)
+    valid_size = int (cfg_dataset.split[1] * tmp_len)
     test_size = tmp_len - train_size - valid_size
 
     train_dataset, valid_dataset,test_dataset = random_split(dataset, [train_size, valid_size, test_size])
-    
-    train_dataset = DataLoader(train_dataset, batch_size, num_workers = num_workers, pin_memory = pin_memory )
-    valid_dataset = DataLoader(valid_dataset, batch_size, num_workers = num_workers, pin_memory = pin_memory )
-    test_dataset  = DataLoader(test_dataset , batch_size, num_workers = num_workers, pin_memory = pin_memory )
+    batch_size = cfg_dataset.batch_size
+    train_dataset = DataLoader(train_dataset, batch_size, num_workers = cfg_dataset.num_workers, pin_memory = cfg_dataset.pin_memory )
+    valid_dataset = DataLoader(valid_dataset, batch_size, num_workers = cfg_dataset.num_workers, pin_memory = cfg_dataset.pin_memory )
+    test_dataset  = DataLoader(test_dataset , batch_size, num_workers = cfg_dataset.num_workers, pin_memory = cfg_dataset.pin_memory )
     
     return train_dataset,valid_dataset, test_dataset

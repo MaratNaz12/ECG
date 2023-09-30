@@ -1,39 +1,39 @@
 import torch.optim
+import hydra
+from omegaconf import DictConfig
+import logging
+log = logging.getLogger(__name__)
+
 import data_preparation as dp
 import model as mdl
 import training as tr
-import argparse
-
-'''
-batch_size = 500
-t_s = 0.8
-v_s = 0.1
-num_workers = 1
-pin_memory = True
-batch_size = 500
-path = 'files_processed/'
-'''
-
-parser = argparse.ArgumentParser(description='Dataloading configuration')
-
-parser.add_argument('-p', '--path', type=str, default='', help='dir with data'  )
-
-args = parser.parse_args() 
-
-ptlg_name = 'SR'
-
-train_dataset,valid_dataset,test_dataset = dp.DatasetCreation(args.path, ptlg_name)
+import visualization as vs
+import evaluation as evl
 
 
+@hydra.main(version_base=None, config_path="conf", config_name="config")
+def train(cfg : DictConfig) -> None:
+
+    train_dataset,valid_dataset,test_dataset = dp.DatasetCreation(cfg.dataset)
+
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    
+    model = mdl.RhythmECGClassification(12,1)
+
+    optim = hydra.utils.instantiate(cfg.optim)
+  
+
+    trained_model, train_history = tr.train_model (model, optim, device, train_dataset, valid_dataset, cfg.epoches)
+
+    vs.visual_resisual_res(train_history, cfg.epoches)
+
+    log.info(f'train_history: {train_history}')
+
+    test_metrics = evl.evaluate(trained_model, test_dataset,device)
+
+    log.info(f'history: {test_metrics}')
 
 
-model = mdl.RhythmECGClassification(12,1)
-lr = 0.000
-epochs_num = 10
-optim = torch.optim.Adam
-weight_decay = True
-grad_clipping = True
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-
-model = tr.train_model(model, device, train_dataset, valid_dataset, epochs_num, lr)
+    
+train()
