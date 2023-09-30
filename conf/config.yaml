@@ -1,0 +1,8 @@
+defaults:
+  - dataset: ptbxl
+  - optim:  adam
+  - _self_
+
+hyperparams:
+  grad_clip: True
+  epoches: 10
