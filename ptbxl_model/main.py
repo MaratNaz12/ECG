@@ -23,11 +23,12 @@ def train(cfg : DictConfig) -> None:
     optim = hydra.utils.instantiate(cfg.optim)
   
 
-    trained_model, train_history = tr.train_model (model, optim, device, train_dataset, valid_dataset, cfg.epoches)
+    trained_model, train_history = tr.train_model (model, optim, device, train_dataset, valid_dataset, cfg.hyperparams.epoches)
 
     vs.visual_resisual_res(train_history, cfg.epoches)
 
     log.info(f'train_history: {train_history}')
+
 
     test_metrics = evl.evaluate(trained_model, test_dataset,device)
 
