@@ -1,4 +1,5 @@
 import requests
+import os
 from tqdm import tqdm
 
 '''
@@ -19,7 +20,7 @@ def data_load(path_for_dir ):
     block_size = 1024
     progress_bar = tqdm(total=zipfile_size, unit='KBi', desc = 'Data loading status', unit_scale=True)
 
-    with open(path_for_dir + 'PTB_XL.zip', 'wb') as file:
+    with open(os.path.join(path_for_dir, 'PTB_XL.zip'), 'wb') as file:
         for data in response.iter_content(block_size):
             file.write(data)
             progress_bar.update(len(data))

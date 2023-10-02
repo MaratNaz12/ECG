@@ -37,7 +37,7 @@
 ---
 ### 4.Запустите обучение модели настроив [конфигурацию](https://hydra.cc/docs/intro/)
 
-        python3 main.py dataset.path_for_sig = <path to data>   dataset.path_for_datamap = <path to ptbxl_database.csv> 
+        python3 main.py dataset.path_for_sigs = <path to data>   dataset.path_for_datamap = <path to ptbxl_database.csv> 
 ---
 
 

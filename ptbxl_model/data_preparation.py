@@ -12,10 +12,10 @@ class DatasetPTBXL(Dataset):
 
     def __init__(self, cfg_dataset):
 
-        self.path_for_data = cfg_dataset.path_for_sigs + '/'
-        self.path_for_map =  cfg_dataset.path_for_datamap + '/'
+        self.path_for_data = cfg_dataset.path_for_sigs
+        self.path_for_map =  cfg_dataset.path_for_datamap
     
-        self.df = pd.read_csv(self.path_for_map+ 'ptbxl_database.csv', index_col = 'ecg_id')       
+        self.df = pd.read_csv(os.path.join(self.path_for_map, 'ptbxl_database.csv'), index_col = 'ecg_id')       
 
         self.target_name = cfg_dataset.pat_name
 
@@ -24,7 +24,8 @@ class DatasetPTBXL(Dataset):
 
 
     def __getitem__(self, idx):
-        data = np.load(self.path_for_data + str(idx+1) + '.npy')
+        filename = os.path.join(self.path_for_data, f'{idx+1}.npy')
+        data = np.load(filename)
 
         target  = int(self.target_name in ast.literal_eval(self.df.iloc[idx]['scp_codes'])) 
 

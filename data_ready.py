@@ -17,11 +17,13 @@ parser.add_argument( '-k', '--keep', action = "store_true", help='flag to keep r
 args = parser.parse_args() 
 
 
-if not (args.path_dst == ''): 
-    args.path_dst += '/'
+# if not (args.path_dst == ''): 
+#     args.path_dst += '/'
 
 if args.path_src == '':
-    if not os.path.exists(args.path_dst + 'PTB_XL.zip') and not os.path.exists(args.path_dst + 'files_processed'):
+    arxiv_path = os.path.join(args.path_dst, 'PTB_XL.zip')
+    processed_dir = os.path.join(args.path_dst, 'files_processed')
+    if not arxiv_path and not processed_dir:
         print("Downloading started") 
         flag = data_load(args.path_dst)
         if flag == False:
