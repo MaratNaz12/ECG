@@ -13,6 +13,6 @@ def visual_res(history, epochs_num ):
     plt.plot(list(range(epochs_num)), [x['model_ROCAUC'] for x in history], label = 'AUC')
     plt.plot(list(range(epochs_num)), [x['model_acc'] for x in history], label = 'Acc')
     plt.plot(list(range(epochs_num)), [x['mean_train_loss'] for x in history], label = 'train_loss')
-    plt.plot(list(range(epochs_num)), [x['model_mean_valid_loss'] for x in history], label = 'valid_loss')
+    plt.plot(list(range(epochs_num)), [x['model_mean_loss'] for x in history], label = 'valid_loss')
     plt.grid(True)
     plt.legend()

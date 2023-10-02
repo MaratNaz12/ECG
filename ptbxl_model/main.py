@@ -10,7 +10,7 @@ import training as tr
 import visualization as vs
 import evaluation as evl
 
-
+#/home/nazaryan/ECG/.venv/bin/python  main.py dataset.path_for_sigs=/home/nazaryan/ECG/data/files_processed dataset.path_for_datamap=/home/nazaryan/ECG/data
 @hydra.main(version_base=None, config_path="conf", config_name="config")
 def train(cfg : DictConfig) -> None:
 
@@ -25,7 +25,7 @@ def train(cfg : DictConfig) -> None:
 
     trained_model, train_history = tr.train_model (model, optim, device, train_dataset, valid_dataset, cfg.hyperparams.epoches)
 
-    vs.visual_resisual_res(train_history, cfg.epoches)
+    vs.visual_res(train_history, cfg.hyperparams.epoches)
 
     log.info(f'train_history: {train_history}')
 

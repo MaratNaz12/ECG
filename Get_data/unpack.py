@@ -14,4 +14,4 @@ def unpack(path_dst ):
 
     os.remove(arxiv_path)
 
-    return 'PTB_XL/ptb-xl-a-large-publicly-available-electrocardiography-dataset-1.0.1/'
+    return 'PTB_XL/ptb-xl-a-large-publicly-available-electrocardiography-dataset-1.0.1'

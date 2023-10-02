@@ -19,22 +19,22 @@ def evaluate(model, valid_dataset,device):
         valid_loss = 0
         samples_num = 0
         for batch in valid_dataset:
-            data, targets = batch
+            data, target = batch
             data   = data.to(device)
-            target = target.to(device)
+            targets = target.to(device)
             preds = model.validation_step((data,targets))
 
             loss = nn.BCELoss(reduction='sum')
-            vaild_loss += loss(preds, targets)
+            valid_loss += loss(preds, targets.unsqueeze(1)).item()
             samples_num += len(data)
 
-            metric_F1  (preds, targets)
-            metric_Rec (preds, targets)
-            metric_Spec(preds, targets)
-            metric_AUC (preds, targets)
-            metric_Acc (preds, targets)
+            metric_F1  (preds, targets.unsqueeze(1))
+            metric_Rec (preds, targets.unsqueeze(1))
+            metric_Spec(preds, targets.unsqueeze(1))
+            metric_AUC (preds, targets.unsqueeze(1))
+            metric_Acc (preds, targets.unsqueeze(1))
            
-
+        
 
 
     return {'model_acc':               metric_Acc.compute().item(),

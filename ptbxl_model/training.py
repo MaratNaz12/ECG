@@ -24,7 +24,7 @@ def fit(epochs_num, model, optimizer, device, train_dataset, valid_dataset):
             loss.backward()
             optimizer.step()
 
-            train_loss  += loss.detach()
+            train_loss  += loss.item()
             samples_num += len(data)
 
         result = evl.evaluate(model, valid_dataset, device)

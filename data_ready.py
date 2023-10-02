@@ -23,7 +23,7 @@ args = parser.parse_args()
 if args.path_src == '':
     arxiv_path = os.path.join(args.path_dst, 'PTB_XL.zip')
     processed_dir = os.path.join(args.path_dst, 'files_processed')
-    if not arxiv_path and not processed_dir:
+    if not os.path.exists(arxiv_path) and not os.path.exists(processed_dir):
         print("Downloading started") 
         flag = data_load(args.path_dst)
         if flag == False:

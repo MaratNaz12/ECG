@@ -20,6 +20,7 @@ def load_raw_data(df,path_src, path_for_dir,path,dir_name ):
 
 
     to_save = 'files_processed/'
+
     save_dir = os.path.join(path_for_dir, to_save)
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)
@@ -27,7 +28,7 @@ def load_raw_data(df,path_src, path_for_dir,path,dir_name ):
     for index, row in tqdm(df.iterrows(), total=len(df), desc = "Data processing status"):
 
         # .dat .hea -> numpy
-        trn,_ = wfdb.rdsamp(path_src+path+row[dir_name])
+        trn,_ = wfdb.rdsamp(os.path.join(path_src, path, f"{row[dir_name]}"))
         trn = np.array(trn, dtype = np.float32).T
     
 
@@ -36,11 +37,11 @@ def load_raw_data(df,path_src, path_for_dir,path,dir_name ):
 
 
 def start_processing(path_src, path_for_dir, path):
-    data_path = os.path.join(path_for_dir + 'data')
+    data_path = os.path.join(path_for_dir, 'data')
     if not os.path.exists(data_path):
         os.mkdir(data_path)
 
-    copyfile(os.path.join(path_src, 'ptbxl_database.csv'), os.path.join(data_path, 'ptbxl_database.csv'))
+    copyfile(os.path.join(path_src,path, 'ptbxl_database.csv'), os.path.join(data_path, 'ptbxl_database.csv'))
 
     dir_name = 'filename_hr' #sr = 500
     
