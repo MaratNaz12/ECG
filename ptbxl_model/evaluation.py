@@ -1,10 +1,10 @@
-import torch
+from torch import no_grad
 from torchmetrics.classification import BinaryF1Score
 from torchmetrics.classification import BinaryRecall
 from torchmetrics.classification import BinarySpecificity
 from torchmetrics.classification import BinaryAUROC
 from torchmetrics.classification import BinaryAccuracy
-
+import torch.nn as nn
 
 def evaluate(model, valid_dataset,device):
     model.eval()
@@ -15,23 +15,32 @@ def evaluate(model, valid_dataset,device):
     metric_AUC = BinaryAUROC(thresholds=None).to(device)
     metric_Acc = BinaryAccuracy().to(device)
 
-    with torch.no_grad():
+    with no_grad():
+        valid_loss = 0
+        samples_num = 0
         for batch in valid_dataset:
             data, target = batch
             data   = data.to(device)
-            target = target.to(device)
-            tmp = model.validation_step((data,target))
+            targets = target.to(device)
+            preds = model.validation_step((data,targets))
 
-            metric_F1(tmp['batch_preds'], tmp['batch_targets'] )
-            metric_Rec(tmp['batch_preds'], tmp['batch_targets'] )
-            metric_Spec(tmp['batch_preds'], tmp['batch_targets'] )
-            metric_AUC(tmp['batch_preds'], tmp['batch_targets'] )
-            metric_Acc(tmp['batch_preds'], tmp['batch_targets'] )
+            loss = nn.BCELoss(reduction='sum')
+            valid_loss += loss(preds, targets.unsqueeze(1)).item()
+            samples_num += len(data)
+
+            metric_F1  (preds, targets.unsqueeze(1))
+            metric_Rec (preds, targets.unsqueeze(1))
+            metric_Spec(preds, targets.unsqueeze(1))
+            metric_AUC (preds, targets.unsqueeze(1))
+            metric_Acc (preds, targets.unsqueeze(1))
+           
+        
 
 
-
-    return {'model_acc': metric_Acc.compute().item(),
-          'model_F1score': metric_F1.compute().item(),
-          'model_Recall': metric_Rec.compute().item(),
-          'model_Specificity': metric_Spec.compute().item(),
-          'model_ROCAUC': metric_AUC.compute().item() }
+    return {'model_acc':               metric_Acc.compute().item(),
+            'model_F1score':           metric_F1.compute().item(),
+            'model_Recall':            metric_Rec.compute().item(),
+            'model_Specificity':       metric_Spec.compute().item(),
+            'model_ROCAUC':            metric_AUC.compute().item(),
+            'model_total_loss':  valid_loss, 
+            'model_mean_loss':   valid_loss / samples_num}

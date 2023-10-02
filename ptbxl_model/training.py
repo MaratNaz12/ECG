@@ -1,11 +1,9 @@
 import torch
-import visualization as vs
 import evaluation as evl
+from tqdm import tqdm
 
-def fit(epochs_num, lr,model, device, train_dataset, valid_dataset, opt = torch.optim.Adam, wd = True, gc = True):
+def fit(epochs_num, model, optimizer, device, train_dataset, valid_dataset):
 
-    
-    optimizer = opt(model.parameters(), lr, weight_decay = wd)
     history = []
 
 
@@ -15,7 +13,8 @@ def fit(epochs_num, lr,model, device, train_dataset, valid_dataset, opt = torch.
         train_loss = 0
         samples_num = 0
 
-        for batch in train_dataset:
+        for batch in tqdm(train_dataset, desc = f"epoch{epoch}"):
+
             data, target = batch
             data   = data.to(device)
             target = target.to(device)
@@ -23,26 +22,22 @@ def fit(epochs_num, lr,model, device, train_dataset, valid_dataset, opt = torch.
             
             loss = model.training_step((data,target))
             loss.backward()
-            #if gc == True:
-            #   torch.nn.utils.clip_grad_norm_(model.parameters(), args.clip)
             optimizer.step()
-            #optimizer.zero_grad()
 
-            train_loss  += loss.detach()
+            train_loss  += loss.item()
             samples_num += len(data)
 
         result = evl.evaluate(model, valid_dataset, device)
-        result['train_loss'] = train_loss / samples_num
+        result['mean_train_loss'] = train_loss / samples_num
+        result['total_train_loss'] = train_loss 
         history.append(result)
 
-        print('Epoch ', epoch,end = "")
-        print(': train_loss = %.4f'%(train_loss/ samples_num))
-
-    return history
+    return model,history
 
 
-def train_model(model, device,  train_dataset, valid_dataset, epochs_num, lr, opt = torch.optim.Adam, wd = True, gc = True):
+def train_model(model, optim, device,  train_dataset, valid_dataset, epochs_num):
+    
     model = model.to(device)
-    history = fit(epochs_num, lr,model, device, train_dataset, valid_dataset,opt,wd,gc)
-    vs.isual_res(history,epochs_num)
-    return model
+    optimizer = optim (params = model.parameters() )
+    model,history = fit(epochs_num, model, optimizer, device, train_dataset, valid_dataset)
+    return model, history

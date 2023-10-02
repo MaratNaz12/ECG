@@ -115,12 +115,12 @@ class RhythmECGClassification(nn.Module):
 
     def training_step(self,batch):
         signals,targets = batch
-        preds = self((signals))
-        loss = nn.BCELoss()
-        return loss(preds, targets)
+        preds = self(signals)
+        loss = nn.BCELoss(reduction='sum')
+        return loss(preds, targets.unsqueeze(1))
 
 
     def validation_step(self,batch):
         signals,targets = batch
-        preds = self((signals.float()))
-        return { 'batch_preds': preds.detach(), 'batch_targets': targets}
+        preds = self(signals.float())
+        return preds

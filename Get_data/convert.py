@@ -1,9 +1,9 @@
 import numpy as np
 import wfdb
-import ast
 import pandas as pd
 from tqdm import tqdm
 import os
+from shutil import copyfile
 
 '''
 Построчно проходим по файлу ptbxl_database.csv, создаем вектор бинарных таргетов по патологиям [12x1] и, 
@@ -14,50 +14,37 @@ import os
 '''
 
 
-# make binary target vector for each ecg
-def aggregate_diagnostic(y_dic, target_list):
-      tmp = np.zeros((len(target_list),1))
-      for i in range (len(target_list)):
-          if target_list[i] in y_dic:
-              tmp[i] = 1
-      return tmp
-
         
 #convert .dat .hea files into numpy arrays
-def load_raw_data(df,path_for_dir,path,target_list,dir_name ):
-    #checks if directory exists
-    #"count" to name new files
-    count = 1
+def load_raw_data(df,path_src, path_for_dir,path,dir_name ):
+
+
     to_save = 'files_processed/'
-    if not os.path.exists(path_for_dir+ to_save):
-        os.mkdir(path_for_dir+ to_save)
 
-    for index, row in tqdm(df.iterrows()):
+    save_dir = os.path.join(path_for_dir, to_save)
+    if not os.path.exists(save_dir):
+        os.mkdir(save_dir)
 
-        #.dat .hea -> numpy
-        trn,_ = wfdb.rdsamp(path_for_dir+path+row[dir_name])
-        trn = np.array(trn).T
+    for index, row in tqdm(df.iterrows(), total=len(df), desc = "Data processing status"):
 
-        #convert text from database to dicts of pathologies 
-        trgt = ast.literal_eval(row['scp_codes']) 
-        trgt =aggregate_diagnostic(trgt, target_list)
-        
-        #saving dicts for each ecg
-        tmp_dict = {'data': trn, 'target': trgt}
-        np.save(path_for_dir+ to_save+str(count)+'.npy', tmp_dict)
-        count+=1
-
-
-
-
-def start_processing(path_for_dir, path):
-   
-    dir_name = 'filename_hr' #sr = 500
-
-    #creating list of rhytthm  pathologies from scp_statements.csv
-    file_statements = pd.read_csv(path_for_dir+ path+ 'scp_statements.csv', index_col = 0)
-    rhythm_pathologies  = list(file_statements[file_statements.rhythm == 1].index)
-
+        # .dat .hea -> numpy
+        trn,_ = wfdb.rdsamp(os.path.join(path_src, path, f"{row[dir_name]}"))
+        trn = np.array(trn, dtype = np.float32).T
     
-    file_database= pd.read_csv(path_for_dir + path+'ptbxl_database.csv', index_col = 'ecg_id')
-    load_raw_data(file_database, path_for_dir, path, rhythm_pathologies, dir_name ) 
+
+        np.save(os.path.join(save_dir, f'{str(index)}.npy'), trn)
+
+
+
+def start_processing(path_src, path_for_dir, path):
+    data_path = os.path.join(path_for_dir, 'data')
+    if not os.path.exists(data_path):
+        os.mkdir(data_path)
+
+    copyfile(os.path.join(path_src,path, 'ptbxl_database.csv'), os.path.join(data_path, 'ptbxl_database.csv'))
+
+    dir_name = 'filename_hr' #sr = 500
+    
+    file_database= pd.read_csv(os.path.join(path_src, path, 'ptbxl_database.csv'), index_col = 'ecg_id')
+    load_raw_data(file_database, path_src, data_path, path,  dir_name) 
+

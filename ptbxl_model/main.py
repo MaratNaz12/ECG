@@ -1,29 +1,40 @@
 import torch.optim
+import hydra
+from omegaconf import DictConfig
+import logging
+log = logging.getLogger(__name__)
+
 import data_preparation as dp
 import model as mdl
 import training as tr
+import visualization as vs
+import evaluation as evl
 
-'''
-batch_size = 500
-t_s = 0.8
-v_s = 0.1
-num_workers = 1
-pin_memory = True
-batch_size = 500
-path = 'files_processed/'
-'''
+#/home/nazaryan/ECG/.venv/bin/python  main.py dataset.path_for_sigs=/home/nazaryan/ECG/data/files_processed dataset.path_for_datamap=/home/nazaryan/ECG/data
+@hydra.main(version_base=None, config_path="conf", config_name="config")
+def train(cfg : DictConfig) -> None:
 
-ptlg_name = 'SR'
-train_dataset,valid_dataset,test_dataset = dp.DatasetCreation(ptlg_name)
+    train_dataset,valid_dataset,test_dataset = dp.DatasetCreation(cfg.dataset)
 
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    
+    model = mdl.RhythmECGClassification(12,1)
 
-model = mdl.RhythmECGClassification(12,1)
-lr = 0.0003
-epochs_num = 10
-optim = torch.optim.Adam
-weight_decay = True
-grad_clipping = True
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    optim = hydra.utils.instantiate(cfg.optim)
+  
+
+    trained_model, train_history = tr.train_model (model, optim, device, train_dataset, valid_dataset, cfg.hyperparams.epoches)
+
+    vs.visual_res(train_history, cfg.hyperparams.epoches)
+
+    log.info(f'train_history: {train_history}')
 
 
-model = tr.train_model(model, device, train_dataset, valid_dataset, epochs_num, lr)
+    test_metrics = evl.evaluate(trained_model, test_dataset,device)
+
+    log.info(f'history: {test_metrics}')
+
+
+
+    
+train()
